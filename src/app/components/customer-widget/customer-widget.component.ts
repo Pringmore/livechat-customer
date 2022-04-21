@@ -32,10 +32,13 @@ export class CustomerWidgetComponent implements OnInit {
       console.log('connected', { customer, availability, greeting });
       
       this.fetchPrechat();
-      this.updateQueuingState();
+      this.listChats();
+      
+      //this.getChatData();
+      //this.updateQueuingState();
 
       //this.startNewChat();
-      this.queueHasBeenUpdate();
+      //this.queueHasBeenUpdate();
     })
 
     this.customerSDK.on('new_event', newEvent => {
@@ -59,6 +62,69 @@ export class CustomerWidgetComponent implements OnInit {
       .catch(error => {
         console.log(error)
       })
+  }
+
+  listChats(): void {
+    this.customerSDK.listChats()
+      .then(({ chatsSummary, totalChats }) => {
+        console.log(chatsSummary);
+        console.log(totalChats);
+
+        for (const chatEntity of chatsSummary) {
+          this.getChat(chatEntity.id);
+        }
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
+  getChatData(): void {
+    this.customerSDK.on('incoming_chat', payload => {
+      const { chat } = payload;
+      const { id, access, users, properties, thread } = chat;
+
+      console.log('incoming_chat', { id, access, users, properties, thread });
+
+      this.getChat(payload.chat.id);
+      this.getChatHistory(payload.chat.id);
+    })
+  }
+
+  getChat(chatId: string): void {
+    console.log(chatId);
+
+    this.customerSDK
+      .getChat({
+        chatId: chatId,
+      })
+      .then(chat => {
+        const { id, access, users, properties, thread } = chat
+        console.log({ id, access, users, properties, thread })
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
+  getChatHistory(chatId: string): void {
+    let wholeChatHistoryLoaded = false
+
+    const history = this.customerSDK.getChatHistory({ chatId: 'OU0V0P0OWT' })
+
+    history.next().then(result => {
+      if (result.done) {
+        wholeChatHistoryLoaded = true
+      }
+
+      const { threads } = result.value
+
+      const events = threads
+        .map(thread => thread.events || [])
+        .reduce((acc, current) => acc.concat(current), [])
+
+      console.log(events)
+    })
   }
 
   updateQueuingState(): void {
