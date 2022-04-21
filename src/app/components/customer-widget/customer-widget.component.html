@@ -14,7 +14,16 @@
             </div>
           </mat-panel-title>
         </mat-expansion-panel-header>  
-        <section class="chat-history-area"></section>
+
+        <section class="chat-history-area">
+          <div *ngIf="allowChat && !agentIsOnline" class="queuing-message-container">
+            <p>Thank you! Your message has been sent. Our support team will contact you soon.</p>
+          </div>  
+
+          <button *ngIf="allowChat && agentIsOnline" class="start-chat" mat-flat-button (click)="openChat()"> Start chat</button>
+          <button *ngIf="!allowChat" class="pre-chat" mat-flat-button (click)="openPreChat()"> Fill the Pre-chat form</button>
+        </section>
+        
         <section class="chat-writing-area"></section>
             
     </mat-expansion-panel>

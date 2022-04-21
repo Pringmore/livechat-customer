@@ -60,7 +60,20 @@
             border-top: 1px solid #dddddd;
             height: 15em;
             margin: 0 -24px;
+            padding: 1em;
             background-image: linear-gradient(-206deg, #ffffff, #ebebeb);
+
+            .queuing-message-container {
+                background-color: #dddddd;
+                border-radius: 14px 14px 14px 0;
+                padding: 10px;
+            }
+
+            button.pre-chat, button.start-chat {
+                width: 100%;
+                background-color: #c77f06;
+                color: white;
+            }
         }
 
         section.chat-writing-area {

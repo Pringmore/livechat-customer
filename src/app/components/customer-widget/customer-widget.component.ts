@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { init } from '@livechat/customer-sdk';
+import { PreChatFormComponent } from '../pre-chat-form/pre-chat-form.component';
 
 @Component({
   selector: 'app-customer-widget',
@@ -7,12 +9,15 @@ import { init } from '@livechat/customer-sdk';
   styleUrls: ['./customer-widget.component.scss']
 })
 export class CustomerWidgetComponent implements OnInit {
+  allowChat = false;
   agentIsOnline = false;
   agentProfilePhoto = null;
   agentName = null;
   customerSDK;
 
-  constructor() {
+  constructor(
+    public dialog: MatDialog
+  ) {
     this.customerSDK = init({
       licenseId: 14016456,
       clientId: '1a91c60c41a16e5c4d71cbc5a2fc8bc0'
@@ -26,8 +31,8 @@ export class CustomerWidgetComponent implements OnInit {
       const { customer, availability, greeting } = payload;
       
       this.agentIsOnline = payload.availability === "online" ? true : false;
-      this.agentProfilePhoto = payload.availability === "online" ? payload.greeting.agent.avatar : null;
-      this.agentName = payload.availability === "online" ? payload.greeting.agent.name : null;
+      this.agentProfilePhoto = payload.availability === "online" ? payload?.greeting?.agent?.avatar : null;
+      this.agentName = payload.availability === "online" ? payload?.greeting?.agent?.name : null;
 
       console.log('connected', { customer, availability, greeting });
       
@@ -160,5 +165,29 @@ export class CustomerWidgetComponent implements OnInit {
       console.log(payload.queue.position)
       console.log(payload.queue.waitTime)
     })
+  }
+
+  openPreChat(): void {
+    const dialogRef = this.dialog.open(PreChatFormComponent, {
+      height: '100vh',
+      minHeight: '600px',
+      maxHeight: '1000px',
+      width: '80vw',
+      minWidth: '600px',
+      maxWidth: '800px',
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+
+      if (result) {
+        this.allowChat = true;
+      }
+    });
+  }
+
+  openChat(): void {
+    console.log('*********  INFORM DASHBOARD  ****');
   }
 }
